@@ -47,7 +47,7 @@ class VecRay {
 
     let newX = mouseX + a;
     let newY = mouseY + o;
-    if (min(wall.y1, wall.y2) <= newY <= max(wall.y1, wall.y2)) {
+    if (newY === constrain(newY, wall.y1, wall.y2)) {
       return [newX, newY];
     } else {
       return [this.v.x + mouseX, this.v.y + mouseY];
@@ -63,5 +63,21 @@ class Wall {
     this.ref = reflective;
     stroke(255);
     line(x1, y1, x2, y2);
+  }
+
+  getX(y) {
+    if (y === constrain(y, this.y1, this.y2)) {
+      let m = (this.y2 - this.y1) / (this.x2 - this.x1);
+      return ((y - this.y1) / m) + this.x1;
+    }
+    return null;
+  }
+
+  getY(x) {
+    if (x === constrain(x, this.x1, this.x2)) {
+      let m = (this.y2 - this.y1) / (this.x2 - this.x1);
+      return m * (x - this.x1) + this.y1;
+    }
+    return null;
   }
 }
