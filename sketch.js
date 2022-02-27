@@ -1,46 +1,67 @@
 const res = 10;
 let rs = [];
+let walls = [];
 
 function setup() {
+  stroke(255);
   createCanvas(600, 600);
-  createRays();
+  //createRays();
+  createVecRays();
+  walls.push(new Wall(450, 200, 450, 400, false));
 }
 
 function draw() {
   background(20);
   for (r of rs) {
-      r.show();
-      text(`${r.x},${r.y}`, 20, 20);
+    r.show();
+  }
+
+}
+
+function createVecRays() {
+  for (let i = 0; i < 360; i += 15) {
+    rs.push(new VecRay(i));
   }
 }
 
-function createRays() {
-  for (let i = 0; i < (width); i += res) {
-    rs.push(new Ray(i, 0));
-    rs.push(new Ray(width - 1, i));
-    rs.push(new Ray(i + res, height - 1));
-    rs.push(new Ray(0, i + res));
-  }
-}
-
-class Ray {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
+class VecRay {
+  constructor(angle) {
+    this.angle = angle;
+    this.v = p5.Vector.fromAngle(radians(this.angle), sqrt(720000));
   }
   show() {
     let mX = constrain(mouseX, 0, width);
     let mY = constrain(mouseY, 0, height);
     stroke(255);
-    line(this.x, this.y, mX, mY);
-  }/*
-  checkColl(walls) {
-    for (w of walls) {
-      //check collision
+    for (let w of walls) {
+      line(this.checkColl(w)[0], this.checkColl(w)[1], mX, mY);
     }
-  }*/
+
+  }
+  //check for a collision with a vertical wall using trig
+  //returns new [x1,y1] of vecRay (doesnt change if no collision)
+  checkColl(wall) {
+    let a = wall.x1 - mouseX
+    //check this.y increase when this.x increased by a
+    let o = a * Math.tan(this.angle);
+
+    let newX = mouseX + a;
+    let newY = mouseY + o;
+    if (min(wall.y1, wall.y2) <= newY <= max(wall.y1, wall.y2)) {
+      return [newX, newY];
+    } else {
+      return [this.v.x + mouseX, this.v.y + mouseY];
+    }
+  }
 }
-
 class Wall {
-
+  constructor(x1, y1, x2, y2, reflective) {
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+    this.ref = reflective;
+    stroke(255);
+    line(x1, y1, x2, y2);
+  }
 }
